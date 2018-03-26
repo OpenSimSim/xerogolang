@@ -127,7 +127,7 @@ func (c *Employees) Update(provider *xerogolang.Provider, session goth.Session) 
 		return nil, err
 	}
 
-	employeeResponseBytes, err := provider.Update(session, "Employees/"+c.Employees[0].EmployeeID, additionalHeaders, body)
+	employeeResponseBytes, err := provider.Update(session, "https://api.xero.com/payroll.xro/1.0/Employees/"+c.Employees[0].EmployeeID, additionalHeaders, body)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func FindEmployeesModifiedSince(provider *xerogolang.Provider, session goth.Sess
 		additionalHeaders["If-Modified-Since"] = modifiedSince.Format(time.RFC3339)
 	}
 
-	employeeResponseBytes, err := provider.FindWithEndpoint(session, "https://api.xero.com/payroll.xro/1.0/", "Employees", additionalHeaders, querystringParameters)
+	employeeResponseBytes, err := provider.Find(session, "https://api.xero.com/payroll.xro/1.0/Employees", additionalHeaders, querystringParameters)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func FindEmployee(provider *xerogolang.Provider, session goth.Session, employeeI
 
 	log.Printf("Calling FindEmployee: %s\n", employeeID)
 
-	employeeResponseBytes, err := provider.FindWithEndpoint(session, "https://api.xero.com/payroll.xro/1.0/", "Employees/"+employeeID, additionalHeaders, nil)
+	employeeResponseBytes, err := provider.Find(session, "https://api.xero.com/payroll.xro/1.0/Employees/"+employeeID, additionalHeaders, nil)
 	if err != nil {
 		return nil, err
 	}

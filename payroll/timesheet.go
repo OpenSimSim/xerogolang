@@ -15,11 +15,13 @@ import (
 type Timesheet struct {
 
 	// The Xero identifier for an timesheet e.g. 297c2dc5-cc47-4afd-8ec8-74990b8761e9
-	TimesheetID string `json:"TimesheetID,omitempty" xml:"TimesheetID"`
+	TimesheetID string `json:"TimesheetID,omitempty" xml:"TimesheetID,omitempty"`
 
-	StartDateUTC string `json:"StartDate,omitempty" xml:"StartDate"`
+	EmployeeID string `json:"EmployeeID,omitempty" xml:"EmployeeID,omitempty"`
 
-	EndDateUTC string `json:"EndDate,omitempty" xml:"EndDate"`
+	StartDateUTC string `json:"StartDate,omitempty" xml:"StartDate,omitempty"`
+
+	EndDateUTC string `json:"EndDate,omitempty" xml:"EndDate,omitempty"`
 
 	Status string `json:"Status,omitempty" xml:"Status,omitempty"`
 
@@ -29,7 +31,7 @@ type Timesheet struct {
 }
 
 type TimesheetLine struct {
-	EarningsRateID string    `json:"EarningsRateID,omitempty" xml:"EarningsRateID"`
+	EarningsRateID string    `json:"EarningsRateID,omitempty" xml:"EarningsRateID,omitempty"`
 	NumberOfUnits  []float64 `json:"NumberOfUnits,omitempty" xml:"NumberOfUnits,omitempty"`
 }
 
@@ -61,12 +63,12 @@ type NumberOfUnit struct {
 */
 //Timesheets contains a collection of Timesheets
 type Timesheets struct {
-	ID           string `json:"Id,omitempty" xml:"Timesheet"`
-	Status       string `json:"Status,omitempty" xml:"Status"`
-	ProviderName string `json:"ProviderName,omitempty" xml:"ProviderName"`
-	DateTimeUTC  string `json:"DateTimeUTC,omitempty" xml:"-"`
+	ID           string `json:"Id,omitempty" xml:"Id,omitempty"`
+	Status       string `json:"Status,omitempty" xml:"Status,omitempty"`
+	ProviderName string `json:"ProviderName,omitempty" xml:"ProviderName,omitempty"`
+	DateTimeUTC  string `json:"DateTimeUTC,omitempty" xml:"DateTimeUTC,omitempty"`
 
-	Timesheets []Timesheet `json:"Timesheets" xml:"Timesheets"`
+	Timesheets []Timesheet `json:"Timesheet" xml:"Timesheet"`
 }
 
 //The Xero API returns Dates based on the .Net JSON date format available at the time of development
@@ -119,7 +121,14 @@ func (c *Timesheets) Create(provider *xerogolang.Provider, session goth.Session)
 		return nil, err
 	}
 
-	timesheetResponseBytes, err := provider.Create(session, "Timesheets", additionalHeaders, body)
+	body2, err := xml.MarshalIndent(c, "  ", "   ")
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("Send timesheet\n%s\n", body2)
+
+	timesheetResponseBytes, err := provider.Create(session, "https://api.xero.com/payroll.xro/1.0/Timesheets", additionalHeaders, body)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +149,7 @@ func (c *Timesheets) Update(provider *xerogolang.Provider, session goth.Session)
 		return nil, err
 	}
 
-	timesheetResponseBytes, err := provider.Update(session, "Timesheets/"+c.Timesheets[0].TimesheetID, additionalHeaders, body)
+	timesheetResponseBytes, err := provider.Update(session, "https://api.xero.com/payroll.xro/1.0/Timesheets/"+c.Timesheets[0].TimesheetID, additionalHeaders, body)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +167,7 @@ func FindTimesheetsModifiedSince(provider *xerogolang.Provider, session goth.Ses
 		additionalHeaders["If-Modified-Since"] = modifiedSince.Format(time.RFC3339)
 	}
 
-	timesheetResponseBytes, err := provider.FindWithEndpoint(session, "https://api.xero.com/payroll.xro/1.0/", "Timesheets", additionalHeaders, querystringParameters)
+	timesheetResponseBytes, err := provider.Find(session, "https://api.xero.com/payroll.xro/1.0/Timesheets", additionalHeaders, querystringParameters)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +188,7 @@ func FindTimesheet(provider *xerogolang.Provider, session goth.Session, timeshee
 
 	log.Printf("Calling FindTimesheet: %s\n", timesheetID)
 
-	timesheetResponseBytes, err := provider.FindWithEndpoint(session, "https://api.xero.com/payroll.xro/1.0/", "Timesheets/"+timesheetID, additionalHeaders, nil)
+	timesheetResponseBytes, err := provider.Find(session, "https://api.xero.com/payroll.xro/1.0/Timesheets/"+timesheetID, additionalHeaders, nil)
 	if err != nil {
 		return nil, err
 	}
