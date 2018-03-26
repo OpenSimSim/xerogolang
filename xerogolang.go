@@ -285,6 +285,26 @@ func (p *Provider) Find(session goth.Session, endpoint string, additionalHeaders
 	return p.processRequest(request, session, additionalHeaders)
 }
 
+//Find retrieves the requested data from an endpoint to be unmarshaled into the appropriate data type
+func (p *Provider) FindWithEndpoint(session goth.Session, ep string, endpoint string, additionalHeaders map[string]string, querystringParameters map[string]string) ([]byte, error) {
+	var querystring string
+	if querystringParameters != nil {
+		for key, value := range querystringParameters {
+			escapedValue := url.QueryEscape(value)
+			querystring = querystring + "&" + key + "=" + escapedValue
+		}
+		querystring = strings.TrimPrefix(querystring, "&")
+		querystring = "?" + querystring
+	}
+
+	request, err := http.NewRequest("GET", ep+endpoint+querystring, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.processRequest(request, session, additionalHeaders)
+}
+
 //Create sends data to an endpoint and returns a response to be unmarshaled into the appropriate data type
 func (p *Provider) Create(session goth.Session, endpoint string, additionalHeaders map[string]string, body []byte) ([]byte, error) {
 	bodyReader := bytes.NewReader(body)
