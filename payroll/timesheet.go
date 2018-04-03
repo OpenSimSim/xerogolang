@@ -116,19 +116,19 @@ func (c *Timesheets) Create(provider *xerogolang.Provider, session goth.Session)
 		"Content-Type": "application/xml",
 	}
 
-	body, err := xml.MarshalIndent(c, "  ", "   ")
-	if err != nil {
-		return nil, err
-	}
+	//body, err := xml.MarshalIndent(c, "  ", "   ")
+	//	if err != nil {
+	//		return nil, err
+	//	}
 
-	body2, err := xml.MarshalIndent(c, "  ", "   ")
+	body2, err := xml.Marshal(c)
 	if err != nil {
 		return nil, err
 	}
 
 	log.Printf("Send timesheet\n%s\n", body2)
 
-	timesheetResponseBytes, err := provider.Create(session, "https://api.xero.com/payroll.xro/1.0/Timesheets", additionalHeaders, body)
+	timesheetResponseBytes, err := provider.Create(session, "https://api.xero.com/payroll.xro/1.0/Timesheets", additionalHeaders, body2)
 	if err != nil {
 		return nil, err
 	}
@@ -144,10 +144,12 @@ func (c *Timesheets) Update(provider *xerogolang.Provider, session goth.Session)
 		"Content-Type": "application/xml",
 	}
 
-	body, err := xml.MarshalIndent(c, "  ", "   ")
+	body, err := xml.Marshal(c)
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("Send timesheet\n%s\n", body)
 
 	timesheetResponseBytes, err := provider.Update(session, "https://api.xero.com/payroll.xro/1.0/Timesheets/"+c.Timesheets[0].TimesheetID, additionalHeaders, body)
 	if err != nil {

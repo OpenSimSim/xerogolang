@@ -18,7 +18,14 @@ type EarningsRate struct {
 	EarningsRateID string `json:"EarningsRateID,omitempty" xml:"EarningsRateID,omitempty"`
 
 	// Name
-	Name string `json:"Name,omitempty"  xml:"Name,omitempty"`
+	Name              string `json:"Name,omitempty"  xml:"Name,omitempty"`
+	EarningsType      string `json:"EarningsType,omitempty"  xml:"EarningsType,omitempty"`
+	RateType          string `json:"RateType,omitempty"  xml:"RateType,omitempty"`
+	AccountCode       string `json:"AccountCode,omitempty"  xml:"AccountCode,omitempty"`
+	TypeOfUnits       string `json:"TypeOfUnits,omitempty"  xml:"TypeOfUnits,omitempty"`
+	IsExemptFromTax   bool   `json:"IsExemptFromTax,omitempty"  xml:"IsExemptFromTax,omitempty"`
+	IsExemptFromSuper bool   `json:"IsExemptFromSuper,omitempty"  xml:"IsExemptFromSuper,omitempty"`
+	IsReportableAsW1  bool   `json:"IsReportableAsW1,omitempty"  xml:"IsReportableAsW1,omitempty"`
 
 	// TODO add other variables - Dont need the others right now.
 
@@ -45,36 +52,42 @@ type EarningsRate struct {
 </PayItems>
 */
 
-type EarningsRates struct {
+type PayItems struct {
 	EarningsRates []EarningsRate `json:"EarningsRates" xml:"EarningsRates"`
+	// TODO DeductionTypes
+	// TODO LeaveTypes
 }
 
 //PayItems contains a collection of PayItems
-type PayItems struct {
-	PayItems []EarningsRates `json:"PayItems" xml:"PayItem"`
+type PayItem struct {
+	ID           string   `json:"Id,omitempty" xml:"Id,omitempty"`
+	Status       string   `json:"Status,omitempty" xml:"Status,omitempty"`
+	ProviderName string   `json:"ProviderName,omitempty" xml:"ProviderName,omitempty"`
+	DateTimeUTC  string   `json:"DateTimeUTC,omitempty" xml:"DateTimeUTC,omitempty"`
+	PayItems     PayItems `json:"PayItems" xml:"PayItems"`
 }
 
 //The Xero API returns Dates based on the .Net JSON date format available at the time of development
 //We need to convert these to a more usable format - RFC3339 for consistency with what the API expects to recieve
-func (c *PayItems) convertDates() error {
-
-	// TODO Use reflection to do this.
+func (c *PayItem) convertDates() error {
 	var err error
-	for n := len(c.PayItems) - 1; n >= 0; n-- {
-		for m := len(c.PayItems[n].EarningsRates) - 1; m >= 0; m-- {
-			c.PayItems[n].EarningsRates[m].UpdatedDateUTC, err = helpers.DotNetJSONTimeToRFC3339(c.PayItems[n].EarningsRates[m].UpdatedDateUTC, true)
-			if err != nil {
-				return err
-			}
+	// TODO Use reflection to do this.
 
+	c.DateTimeUTC, err = helpers.DotNetJSONTimeToRFC3339(c.DateTimeUTC, false)
+
+	for n := len(c.PayItems.EarningsRates) - 1; n >= 0; n-- {
+		c.PayItems.EarningsRates[n].UpdatedDateUTC, err = helpers.DotNetJSONTimeToRFC3339(c.PayItems.EarningsRates[n].UpdatedDateUTC, true)
+		if err != nil {
+			return err
 		}
+
 	}
 
 	return nil
 }
 
-func unmarshalPayItem(payItemResponseBytes []byte) (*PayItems, error) {
-	var payItemResponse *PayItems
+func unmarshalPayItem(payItemResponseBytes []byte) (*PayItem, error) {
+	var payItemResponse *PayItem
 
 	log.Printf("PayItem: %s\n", string(payItemResponseBytes))
 
@@ -92,7 +105,7 @@ func unmarshalPayItem(payItemResponseBytes []byte) (*PayItems, error) {
 }
 
 //Create will create PayItems given an PayItems struct
-func (c *PayItems) Create(provider *xerogolang.Provider, session goth.Session) (*PayItems, error) {
+func (c *PayItem) Create(provider *xerogolang.Provider, session goth.Session) (*PayItem, error) {
 	additionalHeaders := map[string]string{
 		"Accept":       "application/json",
 		"Content-Type": "application/xml",
@@ -113,7 +126,7 @@ func (c *PayItems) Create(provider *xerogolang.Provider, session goth.Session) (
 
 //Update will update a PayItem given a PayItems struct
 //This will only handle single PayItem - you cannot update multiple PayItems in a single call
-func (c *PayItems) Update(provider *xerogolang.Provider, session goth.Session) (*PayItems, error) {
+func (c *PayItem) Update(provider *xerogolang.Provider, session goth.Session) (*PayItem, error) {
 	additionalHeaders := map[string]string{
 		"Accept":       "application/json",
 		"Content-Type": "application/xml",
@@ -124,7 +137,7 @@ func (c *PayItems) Update(provider *xerogolang.Provider, session goth.Session) (
 		return nil, err
 	}
 
-	payItemResponseBytes, err := provider.Update(session, "PayItems/"+c.PayItems[0].EarningsRates[0].EarningsRateID, additionalHeaders, body)
+	payItemResponseBytes, err := provider.Update(session, "PayItems/"+c.PayItems.EarningsRates[0].EarningsRateID, additionalHeaders, body)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +146,7 @@ func (c *PayItems) Update(provider *xerogolang.Provider, session goth.Session) (
 }
 
 //FindPayItemsModifiedSince
-func FindPayItemsModifiedSince(provider *xerogolang.Provider, session goth.Session, modifiedSince time.Time, querystringParameters map[string]string) (*PayItems, error) {
+func FindPayItemsModifiedSince(provider *xerogolang.Provider, session goth.Session, modifiedSince time.Time, querystringParameters map[string]string) (*PayItem, error) {
 	additionalHeaders := map[string]string{
 		"Accept": "application/json",
 	}
@@ -151,12 +164,12 @@ func FindPayItemsModifiedSince(provider *xerogolang.Provider, session goth.Sessi
 }
 
 //FindPayItems will get all PayItems.
-func FindPayItems(provider *xerogolang.Provider, session goth.Session, querystringParameters map[string]string) (*PayItems, error) {
+func FindPayItems(provider *xerogolang.Provider, session goth.Session, querystringParameters map[string]string) (*PayItem, error) {
 	return FindPayItemsModifiedSince(provider, session, dayZero, querystringParameters)
 }
 
 //FindPayItem will get a single PayItem
-func FindPayItem(provider *xerogolang.Provider, session goth.Session, payItemID string) (*PayItems, error) {
+func FindPayItem(provider *xerogolang.Provider, session goth.Session, payItemID string) (*PayItem, error) {
 	additionalHeaders := map[string]string{
 		"Accept": "application/json",
 	}

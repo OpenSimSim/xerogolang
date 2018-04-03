@@ -277,11 +277,11 @@ func (p *Provider) Find(session goth.Session, endpoint string, additionalHeaders
 		querystring = "?" + querystring
 	}
 
-	if strings.HasPrefix(strings.ToLower(endpoint), "http" ) {
+	if strings.HasPrefix(strings.ToLower(endpoint), "http") {
 		endpointProfile = ""
 	}
 
-	log.Printf("Find: %s%s%s\n", endpointProfile,endpoint,querystring))
+	log.Printf("Find: %s%s%s\n", endpointProfile, endpoint, querystring)
 
 	request, err := http.NewRequest("GET", endpointProfile+endpoint+querystring, nil)
 	if err != nil {
@@ -315,10 +315,10 @@ func (p *Provider) FindWithEndpoint(session goth.Session, ep string, endpoint st
 func (p *Provider) Create(session goth.Session, endpoint string, additionalHeaders map[string]string, body []byte) ([]byte, error) {
 	bodyReader := bytes.NewReader(body)
 
-	if strings.HasPrefix(strings.ToLower(endpoint), "http" ) {
+	if strings.HasPrefix(strings.ToLower(endpoint), "http") {
 		endpointProfile = ""
 	}
-	log.Printf("Create: %s%s%s\n", endpointProfile,endpoint,querystring))
+	log.Printf("Create: %s%s\n", endpointProfile, endpoint)
 	request, err := http.NewRequest("PUT", endpointProfile+endpoint, bodyReader)
 	if err != nil {
 		return nil, err
@@ -330,8 +330,8 @@ func (p *Provider) Create(session goth.Session, endpoint string, additionalHeade
 //Update sends data to an endpoint and returns a response to be unmarshaled into the appropriate data type
 func (p *Provider) Update(session goth.Session, endpoint string, additionalHeaders map[string]string, body []byte) ([]byte, error) {
 	bodyReader := bytes.NewReader(body)
-	
-	if strings.HasPrefix(strings.ToLower(endpoint), "http" ) {
+
+	if strings.HasPrefix(strings.ToLower(endpoint), "http") {
 		endpointProfile = ""
 	}
 

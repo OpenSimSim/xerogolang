@@ -15,23 +15,46 @@ import (
 type Employee struct {
 
 	// The Xero identifier for an employee e.g. 297c2dc5-cc47-4afd-8ec8-74990b8761e9
-	EmployeeID string `json:"EmployeeID,omitempty"`
+	EmployeeID string `json:"EmployeeID,omitempty" xml:"Name,omitempty"`
 
 	// Current status of an employee – see employee status types
-	Status string `json:"Status,omitempty"`
+	Status string `json:"Status,omitempty" xml:"Status,omitempty"`
 
 	// First name of an employee (max length = 255)
-	FirstName string `json:"FirstName,omitempty"`
+	FirstName string `json:"FirstName,omitempty" xml:"FirstName,omitempty"`
 
 	// Last name of an employee (max length = 255)
-	LastName string `json:"LastName,omitempty"`
+	LastName string `json:"LastName,omitempty" xml:"LastName,omitempty"`
 
 	//
-	Email string `json:"Email,omitempty"`
+	Email string `json:"Email,omitempty" xml:"Email,omitempty"`
 
-	Gender string `json:"Gender,omitempty"`
+	Gender string `json:"Gender,omitempty" xml:"Gender,omitempty"`
 
-	Phone string `json:"Gender,omitempty"`
+	Phone string `json:"Phone,omitempty" xml:"Phone,omitempty"`
+
+	Mobile string `json:"Mobile,omitempty" xml:"Mobile,omitempty"`
+
+	StartDate string `json:"StartDate,omitempty" xml:"StartDate,omitempty"`
+
+	OrdinaryEarningsRateID string `json:"OrdinaryEarningsRateID,omitempty" xml:"OrdinaryEarningsRateID,omitempty"`
+
+	PayrollCalendarID string `json:"PayrollCalendarID,omitempty" xml:"PayrollCalendarID,omitempty"`
+	/*<Employee>
+	  <EmployeeID>fb4ebd68-6568-41eb-96ab-628a0f54b4b8</EmployeeID>
+	  <FirstName>James</FirstName>
+	  <LastName>Lebron</LastName>
+	  <Status>ACTIVE</Status>
+	  <Email>JL@madeup.email.com</Email>
+	  <DateOfBirth>1978-08-13T00:00:00</DateOfBirth>
+	  <Gender>M</Gender>
+	  <Phone>0400-000-123</Phone>
+	  <Mobile> 408-230-9732</Mobile>
+	  <StartDate>2012-01-30T00:00:00</StartDate>
+	  <OrdinaryEarningsRateID>72e962d1-fcac-4083-8a71-742bb3e7ae14</OrdinaryEarningsRateID>
+	  <PayrollCalendarID>cb8e4706-2fdc-4170-aebd-0ffb855557f5</PayrollCalendarID>
+	  <UpdatedDateUTC>2013-04-01T23:02:36</UpdatedDateUTC>
+	</Employee>*/
 
 	UpdatedDateUTC string `json:"UpdatedDateUTC,omitempty" xml:"-"`
 }
