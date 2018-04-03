@@ -40,42 +40,10 @@ type Employee struct {
 	OrdinaryEarningsRateID string `json:"OrdinaryEarningsRateID,omitempty" xml:"OrdinaryEarningsRateID,omitempty"`
 
 	PayrollCalendarID string `json:"PayrollCalendarID,omitempty" xml:"PayrollCalendarID,omitempty"`
-	/*<Employee>
-	  <EmployeeID>fb4ebd68-6568-41eb-96ab-628a0f54b4b8</EmployeeID>
-	  <FirstName>James</FirstName>
-	  <LastName>Lebron</LastName>
-	  <Status>ACTIVE</Status>
-	  <Email>JL@madeup.email.com</Email>
-	  <DateOfBirth>1978-08-13T00:00:00</DateOfBirth>
-	  <Gender>M</Gender>
-	  <Phone>0400-000-123</Phone>
-	  <Mobile> 408-230-9732</Mobile>
-	  <StartDate>2012-01-30T00:00:00</StartDate>
-	  <OrdinaryEarningsRateID>72e962d1-fcac-4083-8a71-742bb3e7ae14</OrdinaryEarningsRateID>
-	  <PayrollCalendarID>cb8e4706-2fdc-4170-aebd-0ffb855557f5</PayrollCalendarID>
-	  <UpdatedDateUTC>2013-04-01T23:02:36</UpdatedDateUTC>
-	</Employee>*/
 
 	UpdatedDateUTC string `json:"UpdatedDateUTC,omitempty" xml:"-"`
 }
 
-/*
-<Employee>
-    <EmployeeID>fb4ebd68-6568-41eb-96ab-628a0f54b4b8</EmployeeID>
-    <FirstName>James</FirstName>
-    <LastName>Lebron</LastName>
-    <Status>ACTIVE</Status>
-    <Email>JL@madeup.email.com</Email>
-    <DateOfBirth>1978-08-13T00:00:00</DateOfBirth>
-    <Gender>M</Gender>
-    <Phone>0400-000-123</Phone>
-    <Mobile> 408-230-9732</Mobile>
-    <StartDate>2012-01-30T00:00:00</StartDate>
-    <OrdinaryEarningsRateID>72e962d1-fcac-4083-8a71-742bb3e7ae14</OrdinaryEarningsRateID>
-    <PayrollCalendarID>cb8e4706-2fdc-4170-aebd-0ffb855557f5</PayrollCalendarID>
-    <UpdatedDateUTC>2013-04-01T23:02:36</UpdatedDateUTC>
-  </Employee>
-*/
 //Employees contains a collection of Employees
 type Employees struct {
 	Employees []Employee `json:"Employees" xml:"Employee"`
