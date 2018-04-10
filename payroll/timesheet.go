@@ -27,17 +27,19 @@ type Timesheet struct {
 
 	Hours float64 `json:"Hours,omitempty" xml:"Hours,omitempty"`
 
-	TimesheetLine []TimesheetLine `json:"TimesheetLines,omitempty" xml:"TimesheetLines,omitempty"`
+	TimesheetLines []TimesheetLine `json:"TimesheetLines,omitempty" xml:"TimesheetLines>TimesheetLine,omitempty"`
+
+	UpdatedDateUTC string `json:"UpdatedDateUTC,omitempty" xml:"-"`
 }
 
 type TimesheetLine struct {
 	EarningsRateID string    `json:"EarningsRateID,omitempty" xml:"EarningsRateID,omitempty"`
-	NumberOfUnits  []float64 `json:"NumberOfUnits,omitempty" xml:"NumberOfUnits,omitempty"`
+	NumberOfUnits  []float64 `json:"NumberOfUnits" xml:"NumberOfUnits>NumberOfUnit"`
 }
 
-type NumberOfUnit struct {
-	NumberOfUnit float64 `json:"NumberOfUnit,omitempty" xml:"NumberOfUnit,omitempty"`
-}
+//type NumberOfUnit struct {
+//	NumberOfUnit []float64 `xml:"NumberOfUnit,omitempty" json:"-"`
+//}
 
 /*
 <Timesheet>
@@ -68,7 +70,7 @@ type Timesheets struct {
 	ProviderName string `json:"ProviderName,omitempty" xml:"ProviderName,omitempty"`
 	DateTimeUTC  string `json:"DateTimeUTC,omitempty" xml:"DateTimeUTC,omitempty"`
 
-	Timesheets []Timesheet `json:"Timesheet" xml:"Timesheet"`
+	Timesheets []Timesheet `json:"Timesheets" xml:"Timesheet"`
 }
 
 //The Xero API returns Dates based on the .Net JSON date format available at the time of development
@@ -80,13 +82,21 @@ func (c *Timesheets) convertDates() error {
 	if err != nil {
 		return err
 	}
-	/*	var err error
-		for n := len(c.Timesheets) - 1; n >= 0; n-- {
-			c.Timesheets[n].UpdatedDateUTC, err = helpers.DotNetJSONTimeToRFC3339(c.Timesheets[n].UpdatedDateUTC, true)
-			if err != nil {
-				return err
-			}
-		}*/
+
+	for n := len(c.Timesheets) - 1; n >= 0; n-- {
+		c.Timesheets[n].UpdatedDateUTC, err = helpers.DotNetJSONTimeToRFC3339(c.Timesheets[n].UpdatedDateUTC, true)
+		if err != nil {
+			return err
+		}
+		c.Timesheets[n].StartDateUTC, err = helpers.DotNetJSONTimeToRFC3339(c.Timesheets[n].StartDateUTC, true)
+		if err != nil {
+			return err
+		}
+		c.Timesheets[n].EndDateUTC, err = helpers.DotNetJSONTimeToRFC3339(c.Timesheets[n].EndDateUTC, true)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -94,15 +104,16 @@ func (c *Timesheets) convertDates() error {
 func unmarshalTimesheet(timesheetResponseBytes []byte) (*Timesheets, error) {
 	var timesheetResponse *Timesheets
 
-	log.Printf("Timesheet: %s\n", string(timesheetResponseBytes))
-
 	err := json.Unmarshal(timesheetResponseBytes, &timesheetResponse)
 	if err != nil {
+
+		log.Printf("Unmarsal Timesheet ERROR %s\n", err.Error())
 		return nil, err
 	}
 
 	err = timesheetResponse.convertDates()
 	if err != nil {
+		log.Printf("Call convert dates error %s\n", err.Error())
 		return nil, err
 	}
 
@@ -116,19 +127,15 @@ func (c *Timesheets) Create(provider *xerogolang.Provider, session goth.Session)
 		"Content-Type": "application/xml",
 	}
 
-	//body, err := xml.MarshalIndent(c, "  ", "   ")
-	//	if err != nil {
-	//		return nil, err
-	//	}
-
-	body2, err := xml.Marshal(c)
+	body, err := xml.Marshal(c)
 	if err != nil {
+		log.Printf("Send timesheet ERROR %s\n", err.Error())
 		return nil, err
 	}
 
-	log.Printf("Send timesheet\n%s\n", body2)
+	log.Printf("Send timesheet\n%s\n", body)
 
-	timesheetResponseBytes, err := provider.Create(session, "https://api.xero.com/payroll.xro/1.0/Timesheets", additionalHeaders, body2)
+	timesheetResponseBytes, err := provider.Create(session, "https://api.xero.com/payroll.xro/1.0/Timesheets", additionalHeaders, body)
 	if err != nil {
 		return nil, err
 	}
@@ -146,13 +153,15 @@ func (c *Timesheets) Update(provider *xerogolang.Provider, session goth.Session)
 
 	body, err := xml.Marshal(c)
 	if err != nil {
+		log.Printf("Marshall timesheet ERROR %s\n", err.Error())
 		return nil, err
 	}
 
-	log.Printf("Send timesheet\n%s\n", body)
+	log.Printf("Send timesheet... \n%s\n", body)
 
 	timesheetResponseBytes, err := provider.Update(session, "https://api.xero.com/payroll.xro/1.0/Timesheets/"+c.Timesheets[0].TimesheetID, additionalHeaders, body)
 	if err != nil {
+		log.Printf("Update timesheet Error %s\n", err.Error())
 		return nil, err
 	}
 

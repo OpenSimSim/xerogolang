@@ -11,51 +11,57 @@ import (
 	"github.com/opensimsim/xerogolang/helpers"
 )
 
-//PayItem - placeholder waiting for .
 type EarningsRate struct {
-
 	// The Xero identifier for an EarningsRateID e.g. 297c2dc5-cc47-4afd-8ec8-74990b8761e9
 	EarningsRateID string `json:"EarningsRateID,omitempty" xml:"EarningsRateID,omitempty"`
 
 	// Name
-	Name              string `json:"Name,omitempty"  xml:"Name,omitempty"`
-	EarningsType      string `json:"EarningsType,omitempty"  xml:"EarningsType,omitempty"`
-	RateType          string `json:"RateType,omitempty"  xml:"RateType,omitempty"`
+	Name         string `json:"Name,omitempty"  xml:"Name,omitempty"`
+	EarningsType string `json:"EarningsType,omitempty"  xml:"EarningsType,omitempty"`
+	RateType     string `json:"RateType,omitempty"  xml:"RateType,omitempty"`
+	//RatePerUnit
+	// Multiplier
 	AccountCode       string `json:"AccountCode,omitempty"  xml:"AccountCode,omitempty"`
 	TypeOfUnits       string `json:"TypeOfUnits,omitempty"  xml:"TypeOfUnits,omitempty"`
 	IsExemptFromTax   bool   `json:"IsExemptFromTax,omitempty"  xml:"IsExemptFromTax,omitempty"`
 	IsExemptFromSuper bool   `json:"IsExemptFromSuper,omitempty"  xml:"IsExemptFromSuper,omitempty"`
 	IsReportableAsW1  bool   `json:"IsReportableAsW1,omitempty"  xml:"IsReportableAsW1,omitempty"`
-
-	// TODO add other variables - Dont need the others right now.
-
-	UpdatedDateUTC string `json:"UpdatedDateUTC,omitempty"  xml:"UpdatedDateUTC,omitempty"`
+	UpdatedDateUTC    string `json:"UpdatedDateUTC,omitempty"  xml:"UpdatedDateUTC,omitempty"`
 }
 
-/*
-<PayItems>
-  <EarningsRates>
-    <EarningsRate>
-      <EarningsRateID>eca71b79-edab-4c3f-967f-a405453bac08</EarningsRateID>
-      <Name>Ordinary Hours</Name>
-      <EarningsType>ORDINARYTIMEEARNINGS</EarningsType>
-      <RateType>RATEPERUNIT</RateType>
-      <AccountCode>477</AccountCode>
-      <TypeOfUnits>Hours</TypeOfUnits>
-      <IsExemptFromTax>false</IsExemptFromTax>
-      <IsExemptFromSuper>false</IsExemptFromSuper>
-      <IsReportableAsW1>false</IsReportableAsW1>
-      <UpdatedDateUTC>2013-04-09T23:45:25</UpdatedDateUTC>
-    </EarningsRate>
-    ...
+type DeductionType struct {
+	// The Xero identifier for an EarningsRateID e.g. 297c2dc5-cc47-4afd-8ec8-74990b8761e9
+	DeductionTypeID string `json:"DeductionTypeID,omitempty" xml:"DeductionTypeID,omitempty"`
+	Name            string `json:"Name,omitempty"  xml:"Name,omitempty"`
+	AccountCode     string `json:"AccountCode,omitempty"  xml:"AccountCode,omitempty"`
+	ReducesTax      bool   `json:"IsExemptFromTax,omitempty"  xml:"IsExemptFromTax,omitempty"`
+	ReducesSuper    bool   `json:"IsExemptFromSuper,omitempty"  xml:"IsExemptFromSuper,omitempty"`
+	IsExemptFromW1  bool   `json:"IsReportableAsW1,omitempty"  xml:"IsReportableAsW1,omitempty"`
+	UpdatedDateUTC  string `json:"UpdatedDateUTC,omitempty"  xml:"UpdatedDateUTC,omitempty"`
+}
 
-</PayItems>
-*/
+type ReimbursementType struct {
+	ReimbursementTypeID string `json:"ReimbursementTypeID,omitempty" xml:"ReimbursementTypeID,omitempty"`
+	Name                string `json:"Name,omitempty"  xml:"Name,omitempty"`
+	AccountCode         string `json:"AccountCode,omitempty"  xml:"AccountCode,omitempty"`
+	UpdatedDateUTC      string `json:"UpdatedDateUTC,omitempty"  xml:"UpdatedDateUTC,omitempty"`
+}
+
+type LeaveType struct {
+	LeaveTypeID       string  `json:"LeaveTypeID,omitempty" xml:"LeaveTypeID,omitempty"`
+	Name              string  `json:"Name,omitempty"  xml:"Name,omitempty"`
+	TypeOfUnits       string  `json:"TypeOfUnits,omitempty"  xml:"TypeOfUnits,omitempty"`
+	NormalEntitlement float64 `json:"NormalEntitlement,omitempty"  xml:"NormalEntitlement,omitempty"`
+	IsPaidLeave       bool    `json:"IsPaidLeave,omitempty"  xml:"IsPaidLeave,omitempty"`
+	ShowOnPayslip     bool    `json:"ShowOnPayslip,omitempty"  xml:"ShowOnPayslip,omitempty"`
+	UpdatedDateUTC    string  `json:"UpdatedDateUTC,omitempty"  xml:"UpdatedDateUTC,omitempty"`
+}
 
 type PayItems struct {
-	EarningsRates []EarningsRate `json:"EarningsRates" xml:"EarningsRates"`
-	// TODO DeductionTypes
-	// TODO LeaveTypes
+	EarningsRates     []EarningsRate      `json:"EarningsRates" xml:"EarningsRates"`
+	DeductionTypes    []DeductionType     `json:"DeductionTypes" xml:"DeductionTypes"`
+	ReimbursementType []ReimbursementType `json:"ReimbursementType" xml:"ReimbursementType"`
+	LeaveTypes        []LeaveType         `json:"LeaveTypes" xml:"LeaveTypes"`
 }
 
 //PayItems contains a collection of PayItems
@@ -64,7 +70,7 @@ type PayItem struct {
 	Status       string   `json:"Status,omitempty" xml:"Status,omitempty"`
 	ProviderName string   `json:"ProviderName,omitempty" xml:"ProviderName,omitempty"`
 	DateTimeUTC  string   `json:"DateTimeUTC,omitempty" xml:"DateTimeUTC,omitempty"`
-	PayItems     PayItems `json:"PayItems" xml:"PayItems"`
+	PayItems     PayItems `json:"PayItems" xml:"PayItem"`
 }
 
 //The Xero API returns Dates based on the .Net JSON date format available at the time of development

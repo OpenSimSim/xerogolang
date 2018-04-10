@@ -77,8 +77,6 @@ func (c *PayrollCalendars) convertDates() error {
 func unmarshalPayrollCalendar(payrollCalendarResponseBytes []byte) (*PayrollCalendars, error) {
 	var payrollCalendarResponse *PayrollCalendars
 
-	log.Printf("PayrollCalendar: %s\n", string(payrollCalendarResponseBytes))
-
 	err := json.Unmarshal(payrollCalendarResponseBytes, &payrollCalendarResponse)
 	if err != nil {
 		return nil, err
