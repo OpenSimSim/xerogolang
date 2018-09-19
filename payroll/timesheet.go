@@ -153,15 +153,11 @@ func (c *Timesheets) Update(provider *xerogolang.Provider, session goth.Session)
 
 	body, err := xml.Marshal(c)
 	if err != nil {
-		log.Printf("Marshall timesheet ERROR %s\n", err.Error())
 		return nil, err
 	}
 
-	log.Printf("Send timesheet... \n%s\n", body)
-
 	timesheetResponseBytes, err := provider.Update(session, "https://api.xero.com/payroll.xro/1.0/Timesheets/"+c.Timesheets[0].TimesheetID, additionalHeaders, body)
 	if err != nil {
-		log.Printf("Update timesheet Error %s\n", err.Error())
 		return nil, err
 	}
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/markbates/goth"
 	"github.com/opensimsim/xerogolang"
+    "github.com/opensimsim/xerogolang/accounting"    
 	"github.com/opensimsim/xerogolang/helpers"
 )
 
@@ -25,6 +26,10 @@ type Employee struct {
 
 	// Last name of an employee (max length = 255)
 	LastName string `json:"LastName,omitempty" xml:"LastName,omitempty"`
+
+    DateOfBirth string `json:"DateOfBirth,omitempty" xml:"DateOfBirth,omitempty"`
+
+    HomeAddress accounting.Address `json:"HomeAddress,omitempty" xml:"HomeAddress,omitempty"`
 
 	//
 	Email string `json:"Email,omitempty" xml:"Email,omitempty"`
@@ -92,11 +97,11 @@ func (c *Employees) Create(provider *xerogolang.Provider, session goth.Session) 
 		"Content-Type": "application/xml",
 	}
 
-	body, err := xml.MarshalIndent(c, "  ", "   ")
+	body, err := xml.Marshal(c)
 	if err != nil {
 		return nil, err
 	}
-
+    log.Printf("Send Employees\n%s\n", body) 
 	employeeResponseBytes, err := provider.Create(session, "Employees", additionalHeaders, body)
 	if err != nil {
 		return nil, err
@@ -113,10 +118,11 @@ func (c *Employees) Update(provider *xerogolang.Provider, session goth.Session) 
 		"Content-Type": "application/xml",
 	}
 
-	body, err := xml.MarshalIndent(c, "  ", "   ")
+	body, err := xml.Marshal(c)
 	if err != nil {
 		return nil, err
 	}
+    log.Printf("Send Employees\n%s\n", body) 
 
 	employeeResponseBytes, err := provider.Update(session, "https://api.xero.com/payroll.xro/1.0/Employees/"+c.Employees[0].EmployeeID, additionalHeaders, body)
 	if err != nil {

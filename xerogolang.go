@@ -248,17 +248,16 @@ func (p *Provider) processRequest(request *http.Request, session goth.Session, a
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(
-			"%d error trying to find information.\n\nResponse:\n%s",
-			response.StatusCode,
-			helpers.ReaderToString(response.Body),
-		)
+
+		st := helpers.ReaderToString(response.Body)
+		return []byte(st), fmt.Errorf("%d|%s", response.StatusCode, st)
 	}
 
 	responseBytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Could not read response: %s", err.Error())
 	}
+
 	if responseBytes == nil {
 		return nil, fmt.Errorf("Received no response: %s", err.Error())
 	}
@@ -280,8 +279,6 @@ func (p *Provider) Find(session goth.Session, endpoint string, additionalHeaders
 	if strings.HasPrefix(strings.ToLower(endpoint), "http") {
 		endpointProfile = ""
 	}
-
-	log.Printf("Find: %s%s%s\n", endpointProfile, endpoint, querystring)
 
 	request, err := http.NewRequest("GET", endpointProfile+endpoint+querystring, nil)
 	if err != nil {
